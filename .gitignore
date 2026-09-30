@@ -1,0 +1,54 @@
+# ── 模型 / 二进制产物 ──
+*.onnx
+*.so
+*.dll
+*.a
+*.ort
+onnxruntime/
+
+# ── 本地工作目录 ──
+tmp/
+build/
+build_android/
+
+# ── 嵌入式 git 仓库（会被记成 gitlink，克隆者拿到空目录）──
+mlir-src/
+mnn-src/
+tvm-src/
+
+# ── Python ──
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+**/.venv
+
+# ── 课程编译产物（无扩展名，上面的 *.so / *.a 覆盖不到）──
+lesson-*/main
+lesson-*/main_arm
+lesson-*/step1
+lesson-*/mnn_cpp
+lesson-*/mnn_cpp_arm
+lesson-*/02_main_arm
+lesson-*/A3_run
+lesson-*/A4_trace
+lesson-*/B0_plugin_scale
+lesson-*/C2_run
+lesson-*/C3_trace
+
+# ── Learn Inference 离线资料 ──
+# 站点正文免费公开，保留离线副本（Markdown 便于 grep，site/ 可跑交互模拟器，
+# PDF 便于离线通读）。如需从仓库移除，取消下一行注释即可。
+# learn-inference/
+
+# ── 技术名词表.md：有意跟踪（个人术语整理，已做脱敏）──
+
+# ── 第三方预编译库（*.so 覆盖不到带版本号的 .so.1 / .so.1.27.0）──
+*.so.*
+*.so.[0-9]*
+
+# ── 实验输出 / 日志 / 模型权重（可再生成，勿提交）──
+lesson-21-量化原理与误差分析/fsmn_out/
+*.log
+*.mnn

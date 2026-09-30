@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#00c950">
+  <!--
+    The wordmark's die floorplan, drawn on a slightly tighter box than the
+    in-page mark. A favicon is composited at 16px against browser chrome, so
+    the blocks are pushed out to the edges: the padding that gives the mark
+    room in a header is wasted area in a tab.
+  -->
+  <path d="M6.9 2H13.6a1.2 1.2 0 0 1 1.2 1.2v8.9a1.2 1.2 0 0 1-1.2 1.2H3.2A1.2 1.2 0 0 1 2 12.1V6.9z"/>
+  <rect x="16.6" y="2" width="5.4" height="4.7" rx="1"/>
+  <rect x="16.6" y="8.6" width="5.4" height="4.7" rx="1"/>
+  <rect x="2" y="15.2" width="8.6" height="6.8" rx="1.1"/>
+  <rect x="12.5" y="15.2" width="9.5" height="6.8" rx="1.1"/>
+</svg>

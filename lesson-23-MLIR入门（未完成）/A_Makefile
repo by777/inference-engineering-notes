@@ -1,0 +1,45 @@
+# MLIR Lesson 23-01 配套 Makefile
+# 用法: make hello / make add
+# 依赖: ../mlir-src/build/bin/ 下的 mlir-opt / mlir-cpu-runner
+
+
+MLIR_OPT := ../mlir-src/build/bin/mlir-opt
+MLIR_RUNNER := ../mlir-src/build/bin/mlir-cpu-runner
+RUNNER_LIB := ../mlir-src/build/lib/
+
+# 最小lowering链：arith->llvm, func->llvm 清理临时cast
+PIPELINE := builtin.module(func.func(convert-arith-to-llvm), convert-func-to-llvm, reconcile-unrealized-casts)
+
+.PHONY: A1_hello A2_add
+
+# mlir-opt A1_hello.mlir 
+# mlir-opt = "读图 + 打印图"。
+# 它把 .mlir 文本解析成内存里的图，然后重新打印出来。
+# 什么都不做时，就是原样输出（但会格式化——所以 %0 变成了 %c42_i32，
+# 这是给常量起的更可读的名字）。
+
+# mlir-opt --canonicalize A1_hello.mlir
+# --canonicalize 是跑一个优化 pass。canonicalize 做的事：
+# 常量折叠：7+5 → 12
+# 死代码消除：没用的结果删掉
+# 统一写法：把等价的写法归一
+
+# 实验1: parse + canonicalize
+A1_hello: A1_hello.mlir
+	$(MLIR_OPT) A1_hello.mlir
+	@echo " ------- canonicalize ------"
+	$(MLIR_OPT) --canonicalize A1_hello.mlir
+
+# 实验2: lower 到 LLVM IR, 再 JIT 执行
+# # step1：把高级方言变成 LLVM 方言
+# mlir-opt A2_add.mlir -pass-pipeline="builtin.module(func.func(convert-arith-to-llvm),convert-func-to-llvm,reconcile-unrealized-casts)"
+# # step2：JIT 编译并执行
+# ... | mlir-cpu-runner -e main -entry-point-result=i32 -shared-libs=...
+A2_add: A2_add.mlir
+	@echo "--- step1: lower 到 LLVM IR ---"
+	$(MLIR_OPT) A2_add.mlir -pass-pipeline="$(PIPELINE)"
+	@echo "--- step2: JIT 执行 ---"
+	$(MLIR_OPT) A2_add.mlir -pass-pipeline="$(PIPELINE)" | \
+	$(MLIR_RUNNER) -e main -entry-point-result=i32 \
+		-shared-libs=$(RUNNER_LIB)/libmlir_runner_utils.so \
+		-shared-libs=$(RUNNER_LIB)/libmlir_c_runner_utils.so

@@ -1,0 +1,35 @@
+# MLIR Lesson 23-C 配套 Makefile
+# 用法: make fold / make dce / make pipeline / make all
+# 依赖: ../mlir-src/build/bin/ 下的 mlir-opt
+
+MLIR_OPT := ../mlir-src/build/bin/mlir-opt
+
+.PHONY: fold dce pipeline all clean
+
+# 实验1+2: 常量折叠（canonicalize 最经典能力）
+# 7+5、7*5、35-12、+0 全部编译期算完
+fold: C1_canonicalize.mlir C2_folding.mlir
+	@echo "--- C1: (2+3)+5 折叠 ---"
+	$(MLIR_OPT) --canonicalize C1_canonicalize.mlir
+	@echo "--- C2: 全折叠成 23 ---"
+	$(MLIR_OPT) --canonicalize C2_folding.mlir
+
+# 实验3: 死代码消除
+dce: C3_dce.mlir
+	@echo "--- C3: 死代码被删，只剩 3 ---"
+	$(MLIR_OPT) --canonicalize C3_dce.mlir
+
+# 实验4: pass 管线 + 每步打印 + 统计
+pipeline: C4_pipeline.mlir C4b_cse.mlir
+	@echo "--- C4a: 单 pass 折叠成 84 ---"
+	$(MLIR_OPT) --pass-pipeline="builtin.module(func.func(canonicalize))" C4_pipeline.mlir
+	@echo "--- C4b: 两 pass（cse + canonicalize），每步打印 ---"
+	$(MLIR_OPT) --pass-pipeline="builtin.module(func.func(cse,canonicalize))" --mlir-print-ir-after-all C4b_cse.mlir
+	@echo "--- C4b: 统计信息 ---"
+	$(MLIR_OPT) --pass-pipeline="builtin.module(func.func(cse,canonicalize))" --mlir-pass-statistics C4b_cse.mlir 2>&1 | tail -12
+
+all: fold dce pipeline
+	@echo "--- 全部实验完成 ---"
+
+clean:
+	rm -f C*.mlir

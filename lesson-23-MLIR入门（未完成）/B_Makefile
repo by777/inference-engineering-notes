@@ -1,0 +1,46 @@
+# MLIR Lesson 23-B 配套 Makefile
+# 用法: make structure / make tensor / make memref / make scf_lower / make all
+# 依赖: ../mlir-src/build/bin/ 下的 mlir-opt / mlir-cpu-runner
+
+MLIR_OPT    := ../mlir-src/build/bin/mlir-opt
+MLIR_RUNNER := ../mlir-src/build/bin/mlir-cpu-runner
+RUNNER_LIB  := ../mlir-src/build/lib
+
+# 完整 lowering 链（scf/arith → LLVM, func → LLVM）
+# 坑：convert-func-to-llvm 是 module 级别 pass，必须放 builtin.module 直接层！
+#     convert-scf-to-cf / convert-arith-to-llvm 是 func 级别，放 func.func 内
+LOWER_PIPELINE := builtin.module(func.func(convert-scf-to-cf,convert-arith-to-llvm),convert-func-to-llvm,reconcile-unrealized-casts)
+
+# #########################################################################################
+# builtin.module(                      # 作用范围：整个 module
+#  func.func(                          # 对每个函数内部跑：
+#    convert-scf-to-cf,                #   scf 循环 → cf 跳转（for 变成 goto）
+#    convert-arith-to-llvm             #   arith 算术 → llvm（addi 变成 llvm.add）
+#  ),                                  #
+#  convert-func-to-llvm,               # 函数 → llvm.func（module 级别！）
+#  reconcile-unrealized-casts          # 清理降级残留的临时 cast
+# )
+# #########################################################################################
+.PHONY: structure tensor memref scf_lower all
+
+structure: B1_structure.mlir
+	$(MLIR_OPT) B1_structure.mlir
+
+tensor: B2_tensor.mlir
+	$(MLIR_OPT) B2_tensor.mlir
+
+memref: B3_memref.mlir
+	$(MLIR_OPT) B3_memref.mlir
+
+# 把 scf 循环 lower 到 LLVM 看降级结果（对应汇编循环骨架）
+scf_lower: B4_scf_lower.mlir
+	@echo "--- scf.for 降到 LLVM（对应汇编循环骨架）---"
+	$(MLIR_OPT) B4_scf_lower.mlir -pass-pipeline="$(LOWER_PIPELINE)"
+	@echo "--- 执行 sum（期望 6）---"
+	$(MLIR_OPT) B4_scf_lower.mlir -pass-pipeline="$(LOWER_PIPELINE)" | \
+	$(MLIR_RUNNER) -e sum -entry-point-result=i32 \
+		-shared-libs=$(RUNNER_LIB)/libmlir_runner_utils.so \
+		-shared-libs=$(RUNNER_LIB)/libmlir_c_runner_utils.so
+
+all: structure tensor memref scf_lower
+	@echo "--- 全部实验完成 ---"

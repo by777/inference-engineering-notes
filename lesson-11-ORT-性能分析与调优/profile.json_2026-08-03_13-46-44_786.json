@@ -1,0 +1,580 @@
+[
+    {
+        "cat": "Session",
+        "pid": 1967460,
+        "tid": 1967460,
+        "dur": 1746,
+        "ts": 1,
+        "ph": "X",
+        "name": "model_loading_uri",
+        "args": {}
+    },
+    {
+        "cat": "Session",
+        "pid": 1967460,
+        "tid": 1967460,
+        "dur": 2365,
+        "ts": 1750,
+        "ph": "X",
+        "name": "session_initialization",
+        "args": {}
+    },
+    {
+        "cat": "Node",
+        "pid": 1967460,
+        "tid": 1967460,
+        "dur": 55,
+        "ts": 4129,
+        "ph": "X",
+        "name": "fused Gemm1_kernel_time",
+        "args": {
+            "node_index": "6",
+            "provider": "CPUExecutionProvider",
+            "activation_size": "1024",
+            "input_type_shape": [
+                {
+                    "float": [
+                        1,
+                        256
+                    ]
+                },
+                {
+                    "float": [
+                        1024
+                    ]
+                }
+            ],
+            "output_type_shape": [
+                {
+                    "float": [
+                        1,
+                        1024
+                    ]
+                }
+            ],
+            "output_size": "4096",
+            "op_name": "FusedGemm",
+            "thread_scheduling_stats": {
+                "main_thread": {
+                    "thread_pool_name": "session-1-intra-op",
+                    "thread_id": "140424732347264",
+                    "block_size": [
+                        1
+                    ],
+                    "core": 14,
+                    "Distribution": 1,
+                    "DistributionEnqueue": 0,
+                    "Run": 14,
+                    "Wait": 6,
+                    "WaitRevoke": 0
+                },
+                "sub_threads": {
+                    "140424700229120": {
+                        "num_run": 1,
+                        "core": 6
+                    },
+                    "140424691836416": {
+                        "num_run": 1,
+                        "core": 4
+                    },
+                    "140424683443712": {
+                        "num_run": 1,
+                        "core": 25
+                    }
+                }
+            },
+            "parameter_size": "4096"
+        }
+    },
+    {
+        "cat": "Node",
+        "pid": 1967460,
+        "tid": 1967460,
+        "dur": 21,
+        "ts": 4186,
+        "ph": "X",
+        "name": "fused Gemm2_kernel_time",
+        "args": {
+            "op_name": "FusedGemm",
+            "thread_scheduling_stats": {
+                "main_thread": {
+                    "thread_pool_name": "session-1-intra-op",
+                    "thread_id": "140424732347264",
+                    "block_size": [
+                        1
+                    ],
+                    "core": 14,
+                    "Distribution": 0,
+                    "DistributionEnqueue": 0,
+                    "Run": 6,
+                    "Wait": 10,
+                    "WaitRevoke": 0
+                },
+                "sub_threads": {
+                    "140424700229120": {
+                        "num_run": 2,
+                        "core": 6
+                    },
+                    "140424691836416": {
+                        "num_run": 2,
+                        "core": 4
+                    },
+                    "140424683443712": {
+                        "num_run": 2,
+                        "core": 25
+                    }
+                }
+            },
+            "parameter_size": "1024",
+            "activation_size": "4096",
+            "node_index": "7",
+            "provider": "CPUExecutionProvider",
+            "output_size": "1024",
+            "input_type_shape": [
+                {
+                    "float": [
+                        1,
+                        1024
+                    ]
+                },
+                {
+                    "float": [
+                        256
+                    ]
+                }
+            ],
+            "output_type_shape": [
+                {
+                    "float": [
+                        1,
+                        256
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "cat": "Node",
+        "pid": 1967460,
+        "tid": 1967460,
+        "dur": 3,
+        "ts": 4210,
+        "ph": "X",
+        "name": "Gemm3_kernel_time",
+        "args": {
+            "op_name": "Gemm",
+            "activation_size": "1024",
+            "node_index": "4",
+            "input_type_shape": [
+                {
+                    "float": [
+                        1,
+                        256
+                    ]
+                },
+                {
+                    "float": [
+                        10
+                    ]
+                }
+            ],
+            "output_type_shape": [
+                {
+                    "float": [
+                        1,
+                        10
+                    ]
+                }
+            ],
+            "provider": "CPUExecutionProvider",
+            "output_size": "40",
+            "thread_scheduling_stats": {
+                "main_thread": {
+                    "thread_pool_name": "session-1-intra-op",
+                    "thread_id": "140424732347264",
+                    "block_size": [],
+                    "core": 14,
+                    "Distribution": 0,
+                    "DistributionEnqueue": 0,
+                    "Run": 0,
+                    "Wait": 0,
+                    "WaitRevoke": 0
+                },
+                "sub_threads": {
+                    "140424700229120": {
+                        "num_run": 2,
+                        "core": 6
+                    },
+                    "140424691836416": {
+                        "num_run": 2,
+                        "core": 4
+                    },
+                    "140424683443712": {
+                        "num_run": 2,
+                        "core": 25
+                    }
+                }
+            },
+            "parameter_size": "40"
+        }
+    },
+    {
+        "cat": "Node",
+        "pid": 1967460,
+        "tid": 1967460,
+        "dur": 9,
+        "ts": 4215,
+        "ph": "X",
+        "name": "Softmax1_kernel_time",
+        "args": {
+            "op_name": "Softmax",
+            "node_index": "5",
+            "activation_size": "40",
+            "output_type_shape": [
+                {
+                    "float": [
+                        1,
+                        10
+                    ]
+                }
+            ],
+            "parameter_size": "0",
+            "thread_scheduling_stats": {
+                "main_thread": {
+                    "thread_pool_name": "session-1-intra-op",
+                    "thread_id": "140424732347264",
+                    "block_size": [],
+                    "core": 14,
+                    "Distribution": 0,
+                    "DistributionEnqueue": 0,
+                    "Run": 0,
+                    "Wait": 0,
+                    "WaitRevoke": 0
+                },
+                "sub_threads": {
+                    "140424700229120": {
+                        "num_run": 2,
+                        "core": 6
+                    },
+                    "140424691836416": {
+                        "num_run": 2,
+                        "core": 4
+                    },
+                    "140424683443712": {
+                        "num_run": 2,
+                        "core": 25
+                    }
+                }
+            },
+            "input_type_shape": [
+                {
+                    "float": [
+                        1,
+                        10
+                    ]
+                }
+            ],
+            "provider": "CPUExecutionProvider",
+            "output_size": "40"
+        }
+    },
+    {
+        "cat": "Session",
+        "pid": 1967460,
+        "tid": 1967460,
+        "dur": 98,
+        "ts": 4128,
+        "ph": "X",
+        "name": "SequentialExecutor::Execute",
+        "args": {}
+    },
+    {
+        "cat": "Session",
+        "pid": 1967460,
+        "tid": 1967460,
+        "dur": 107,
+        "ts": 4122,
+        "ph": "X",
+        "name": "model_run",
+        "args": {}
+    },
+    {
+        "cat": "Node",
+        "pid": 1967460,
+        "tid": 1967460,
+        "dur": 10,
+        "ts": 4235,
+        "ph": "X",
+        "name": "fused Gemm1_kernel_time",
+        "args": {
+            "activation_size": "1024",
+            "node_index": "6",
+            "op_name": "FusedGemm",
+            "output_size": "4096",
+            "parameter_size": "4096",
+            "input_type_shape": [
+                {
+                    "float": [
+                        1,
+                        256
+                    ]
+                },
+                {
+                    "float": [
+                        1024
+                    ]
+                }
+            ],
+            "thread_scheduling_stats": {
+                "main_thread": {
+                    "thread_pool_name": "session-1-intra-op",
+                    "thread_id": "140424732347264",
+                    "block_size": [
+                        1
+                    ],
+                    "core": 14,
+                    "Distribution": 0,
+                    "DistributionEnqueue": 0,
+                    "Run": 6,
+                    "Wait": 0,
+                    "WaitRevoke": 0
+                },
+                "sub_threads": {
+                    "140424700229120": {
+                        "num_run": 3,
+                        "core": 6
+                    },
+                    "140424691836416": {
+                        "num_run": 3,
+                        "core": 4
+                    },
+                    "140424683443712": {
+                        "num_run": 3,
+                        "core": 25
+                    }
+                }
+            },
+            "output_type_shape": [
+                {
+                    "float": [
+                        1,
+                        1024
+                    ]
+                }
+            ],
+            "provider": "CPUExecutionProvider"
+        }
+    },
+    {
+        "cat": "Node",
+        "pid": 1967460,
+        "tid": 1967460,
+        "dur": 13,
+        "ts": 4247,
+        "ph": "X",
+        "name": "fused Gemm2_kernel_time",
+        "args": {
+            "output_size": "1024",
+            "op_name": "FusedGemm",
+            "thread_scheduling_stats": {
+                "main_thread": {
+                    "thread_pool_name": "session-1-intra-op",
+                    "thread_id": "140424732347264",
+                    "block_size": [
+                        1
+                    ],
+                    "core": 14,
+                    "Distribution": 0,
+                    "DistributionEnqueue": 0,
+                    "Run": 3,
+                    "Wait": 5,
+                    "WaitRevoke": 0
+                },
+                "sub_threads": {
+                    "140424700229120": {
+                        "num_run": 4,
+                        "core": 6
+                    },
+                    "140424691836416": {
+                        "num_run": 4,
+                        "core": 4
+                    },
+                    "140424683443712": {
+                        "num_run": 4,
+                        "core": 25
+                    }
+                }
+            },
+            "parameter_size": "1024",
+            "activation_size": "4096",
+            "input_type_shape": [
+                {
+                    "float": [
+                        1,
+                        1024
+                    ]
+                },
+                {
+                    "float": [
+                        256
+                    ]
+                }
+            ],
+            "node_index": "7",
+            "output_type_shape": [
+                {
+                    "float": [
+                        1,
+                        256
+                    ]
+                }
+            ],
+            "provider": "CPUExecutionProvider"
+        }
+    },
+    {
+        "cat": "Node",
+        "pid": 1967460,
+        "tid": 1967460,
+        "dur": 2,
+        "ts": 4262,
+        "ph": "X",
+        "name": "Gemm3_kernel_time",
+        "args": {
+            "parameter_size": "40",
+            "provider": "CPUExecutionProvider",
+            "node_index": "4",
+            "activation_size": "1024",
+            "thread_scheduling_stats": {
+                "main_thread": {
+                    "thread_pool_name": "session-1-intra-op",
+                    "thread_id": "140424732347264",
+                    "block_size": [],
+                    "core": 14,
+                    "Distribution": 0,
+                    "DistributionEnqueue": 0,
+                    "Run": 0,
+                    "Wait": 0,
+                    "WaitRevoke": 0
+                },
+                "sub_threads": {
+                    "140424700229120": {
+                        "num_run": 4,
+                        "core": 6
+                    },
+                    "140424691836416": {
+                        "num_run": 4,
+                        "core": 4
+                    },
+                    "140424683443712": {
+                        "num_run": 4,
+                        "core": 25
+                    }
+                }
+            },
+            "input_type_shape": [
+                {
+                    "float": [
+                        1,
+                        256
+                    ]
+                },
+                {
+                    "float": [
+                        10
+                    ]
+                }
+            ],
+            "output_size": "40",
+            "output_type_shape": [
+                {
+                    "float": [
+                        1,
+                        10
+                    ]
+                }
+            ],
+            "op_name": "Gemm"
+        }
+    },
+    {
+        "cat": "Node",
+        "pid": 1967460,
+        "tid": 1967460,
+        "dur": 2,
+        "ts": 4266,
+        "ph": "X",
+        "name": "Softmax1_kernel_time",
+        "args": {
+            "node_index": "5",
+            "input_type_shape": [
+                {
+                    "float": [
+                        1,
+                        10
+                    ]
+                }
+            ],
+            "output_size": "40",
+            "activation_size": "40",
+            "op_name": "Softmax",
+            "output_type_shape": [
+                {
+                    "float": [
+                        1,
+                        10
+                    ]
+                }
+            ],
+            "thread_scheduling_stats": {
+                "main_thread": {
+                    "thread_pool_name": "session-1-intra-op",
+                    "thread_id": "140424732347264",
+                    "block_size": [],
+                    "core": 14,
+                    "Distribution": 0,
+                    "DistributionEnqueue": 0,
+                    "Run": 0,
+                    "Wait": 0,
+                    "WaitRevoke": 0
+                },
+                "sub_threads": {
+                    "140424700229120": {
+                        "num_run": 4,
+                        "core": 6
+                    },
+                    "140424691836416": {
+                        "num_run": 4,
+                        "core": 4
+                    },
+                    "140424683443712": {
+                        "num_run": 4,
+                        "core": 25
+                    }
+                }
+            },
+            "provider": "CPUExecutionProvider",
+            "parameter_size": "0"
+        }
+    },
+    {
+        "cat": "Session",
+        "pid": 1967460,
+        "tid": 1967460,
+        "dur": 34,
+        "ts": 4235,
+        "ph": "X",
+        "name": "SequentialExecutor::Execute",
+        "args": {}
+    },
+    {
+        "cat": "Session",
+        "pid": 1967460,
+        "tid": 1967460,
+        "dur": 38,
+        "ts": 4231,
+        "ph": "X",
+        "name": "model_run",
+        "args": {}
+    }
+]

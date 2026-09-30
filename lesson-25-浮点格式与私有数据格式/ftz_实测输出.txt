@@ -1,0 +1,168 @@
+############ ftz_probe.c 实测输出 ############
+# 生成于 2026-09-21 14:39  gcc 11 / clang version
+
+======== gcc -O2 ========
+=== 0. 环境 ===
+  架构: x86_64
+  编译器: gcc 11.4
+  __FAST_MATH__            = 未开启
+  __FINITE_MATH_ONLY__     = 0
+
+=== 1. 内存里的位模式（memcpy，不经 FPU） ===
+  1e-40f               bits=0x000116C2 [SUBNORMAL]  printf=9.999946e-41
+  1e-45f (最小subnormal) bits=0x00000001 [SUBNORMAL]  printf=1.401298e-45
+  ^ 这一节看 bits 列：位模式在不在。
+
+=== 2. DAZ 演示：subnormal 被 FPU 读入 ===
+  运算前   bits = 0x000116C2 [SUBNORMAL]
+  in + in  bits = 0x00022D84 [SUBNORMAL]
+  -> 仍是 subnormal：DAZ 关闭，IEEE 合规（期望 2e-40）
+
+=== 3. FTZ 演示：结果侧下溢（量化 s_w * s_x 就是这个场景） ===
+  1e-20 * 1e-20        bits=0x000116C2 [SUBNORMAL]  printf=9.999946e-41
+  1e-25 * 1e-25        bits=0x00000000 [±0      ]  printf=0.000000e+00
+  -> 前者是 subnormal（FTZ 关闭）
+
+=== 4. x86 MXCSR 状态位 ===
+  MXCSR = 0x00001FB2
+  bit15 FTZ = 0  关（正常）
+  bit 6 DAZ = 0  关（正常）
+
+======== gcc -O2 -ffast-math ========
+=== 0. 环境 ===
+  架构: x86_64
+  编译器: gcc 11.4
+  __FAST_MATH__            = 已开启 ⚠️
+  __FINITE_MATH_ONLY__     = 1
+
+=== 1. 内存里的位模式（memcpy，不经 FPU） ===
+  1e-40f               bits=0x000116C2 [SUBNORMAL]  printf=0.000000e+00
+  1e-45f (最小subnormal) bits=0x00000001 [SUBNORMAL]  printf=0.000000e+00
+  ^ 这一节看 bits 列：位模式在不在。
+
+=== 2. DAZ 演示：subnormal 被 FPU 读入 ===
+  运算前   bits = 0x000116C2 [SUBNORMAL]
+  in + in  bits = 0x00000000 [±0]
+  -> 被刷成 0：DAZ 生效（输入侧 subnormal 被当 0）
+
+=== 3. FTZ 演示：结果侧下溢（量化 s_w * s_x 就是这个场景） ===
+  1e-20 * 1e-20        bits=0x00000000 [±0      ]  printf=0.000000e+00
+  1e-25 * 1e-25        bits=0x00000000 [±0      ]  printf=0.000000e+00
+  -> 前者是 0（FTZ 生效，本应是 subnormal）
+
+=== 4. x86 MXCSR 状态位 ===
+  MXCSR = 0x00009FF0
+  bit15 FTZ = 1  ⚠️ 结果侧刷零
+  bit 6 DAZ = 1  ⚠️ 输入侧当零
+
+======== gcc -O2 -funsafe-math-optimizations ========
+=== 0. 环境 ===
+  架构: x86_64
+  编译器: gcc 11.4
+  __FAST_MATH__            = 未开启
+  __FINITE_MATH_ONLY__     = 0
+
+=== 1. 内存里的位模式（memcpy，不经 FPU） ===
+  1e-40f               bits=0x000116C2 [SUBNORMAL]  printf=0.000000e+00
+  1e-45f (最小subnormal) bits=0x00000001 [SUBNORMAL]  printf=0.000000e+00
+  ^ 这一节看 bits 列：位模式在不在。
+
+=== 2. DAZ 演示：subnormal 被 FPU 读入 ===
+  运算前   bits = 0x000116C2 [SUBNORMAL]
+  in + in  bits = 0x00000000 [±0]
+  -> 被刷成 0：DAZ 生效（输入侧 subnormal 被当 0）
+
+=== 3. FTZ 演示：结果侧下溢（量化 s_w * s_x 就是这个场景） ===
+  1e-20 * 1e-20        bits=0x00000000 [±0      ]  printf=0.000000e+00
+  1e-25 * 1e-25        bits=0x00000000 [±0      ]  printf=0.000000e+00
+  -> 前者是 0（FTZ 生效，本应是 subnormal）
+
+=== 4. x86 MXCSR 状态位 ===
+  MXCSR = 0x00009FF0
+  bit15 FTZ = 1  ⚠️ 结果侧刷零
+  bit 6 DAZ = 1  ⚠️ 输入侧当零
+
+======== gcc -O2 -ffinite-math-only ========
+=== 0. 环境 ===
+  架构: x86_64
+  编译器: gcc 11.4
+  __FAST_MATH__            = 未开启
+  __FINITE_MATH_ONLY__     = 1
+
+=== 1. 内存里的位模式（memcpy，不经 FPU） ===
+  1e-40f               bits=0x000116C2 [SUBNORMAL]  printf=9.999946e-41
+  1e-45f (最小subnormal) bits=0x00000001 [SUBNORMAL]  printf=1.401298e-45
+  ^ 这一节看 bits 列：位模式在不在。
+
+=== 2. DAZ 演示：subnormal 被 FPU 读入 ===
+  运算前   bits = 0x000116C2 [SUBNORMAL]
+  in + in  bits = 0x00022D84 [SUBNORMAL]
+  -> 仍是 subnormal：DAZ 关闭，IEEE 合规（期望 2e-40）
+
+=== 3. FTZ 演示：结果侧下溢（量化 s_w * s_x 就是这个场景） ===
+  1e-20 * 1e-20        bits=0x000116C2 [SUBNORMAL]  printf=9.999946e-41
+  1e-25 * 1e-25        bits=0x00000000 [±0      ]  printf=0.000000e+00
+  -> 前者是 subnormal（FTZ 关闭）
+
+=== 4. x86 MXCSR 状态位 ===
+  MXCSR = 0x00001FB2
+  bit15 FTZ = 0  关（正常）
+  bit 6 DAZ = 0  关（正常）
+
+======== gcc -O2 -ffast-math + --ieee（运行时补救）========
+>>> --ieee：运行时已清掉 FTZ/DAZ，强制 IEEE754 模式
+
+=== 0. 环境 ===
+  架构: x86_64
+  编译器: gcc 11.4
+  __FAST_MATH__            = 已开启 ⚠️
+  __FINITE_MATH_ONLY__     = 1
+
+=== 1. 内存里的位模式（memcpy，不经 FPU） ===
+  1e-40f               bits=0x000116C2 [SUBNORMAL]  printf=9.999946e-41
+  1e-45f (最小subnormal) bits=0x00000001 [SUBNORMAL]  printf=1.401298e-45
+  ^ 这一节看 bits 列：位模式在不在。
+
+=== 2. DAZ 演示：subnormal 被 FPU 读入 ===
+  运算前   bits = 0x000116C2 [SUBNORMAL]
+  in + in  bits = 0x00022D84 [SUBNORMAL]
+  -> 仍是 subnormal：DAZ 关闭，IEEE 合规（期望 2e-40）
+
+=== 3. FTZ 演示：结果侧下溢（量化 s_w * s_x 就是这个场景） ===
+  1e-20 * 1e-20        bits=0x000116C2 [SUBNORMAL]  printf=9.999946e-41
+  1e-25 * 1e-25        bits=0x00000000 [±0      ]  printf=0.000000e+00
+  -> 前者是 subnormal（FTZ 关闭）
+
+=== 4. x86 MXCSR 状态位 ===
+  MXCSR = 0x00001FB2
+  bit15 FTZ = 0  关（正常）
+  bit 6 DAZ = 0  关（正常）
+
+======== aarch64-linux-gnu-gcc -O2 -ffast-math + --ieee（qemu）========
+>>> --ieee：运行时已清掉 FTZ/DAZ，强制 IEEE754 模式
+
+=== 0. 环境 ===
+  架构: aarch64
+  编译器: gcc 11.4
+  __FAST_MATH__            = 已开启 ⚠️
+  __FINITE_MATH_ONLY__     = 1
+
+=== 1. 内存里的位模式（memcpy，不经 FPU） ===
+  1e-40f               bits=0x000116C2 [SUBNORMAL]  printf=9.999946e-41
+  1e-45f (最小subnormal) bits=0x00000001 [SUBNORMAL]  printf=1.401298e-45
+  ^ 这一节看 bits 列：位模式在不在。
+
+=== 2. DAZ 演示：subnormal 被 FPU 读入 ===
+  运算前   bits = 0x000116C2 [SUBNORMAL]
+  in + in  bits = 0x00022D84 [SUBNORMAL]
+  -> 仍是 subnormal：DAZ 关闭，IEEE 合规（期望 2e-40）
+
+=== 3. FTZ 演示：结果侧下溢（量化 s_w * s_x 就是这个场景） ===
+  1e-20 * 1e-20        bits=0x000116C2 [SUBNORMAL]  printf=9.999946e-41
+  1e-25 * 1e-25        bits=0x00000000 [±0      ]  printf=0.000000e+00
+  -> 前者是 subnormal（FTZ 关闭）
+
+=== 4. AArch64 FPCR 状态位 ===
+  FPCR = 0x0000000000000000
+  bit24 FZ = 0  关（正常）
+  bit19 FZ16 = 0 （仅影响 fp16 运算）

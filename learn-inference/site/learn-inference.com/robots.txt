@@ -1,0 +1,6 @@
+User-Agent: *
+Allow: /
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+
+Host: https://learn-inference.com/
+Sitemap: https://learn-inference.com/sitemap.xml
