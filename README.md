@@ -115,7 +115,7 @@ make                # 或 python3 <script>.py
 
 - 保留副本的用途：**离线阅读与 grep**，交互模拟器需本地起服务（`./learn-inference/serve.sh`）。
 - 版权归原作者。若需完整版本，官方提供[免费 PDF/EPUB/有声书申请](https://www.baseten.co/inference-engineering/digital-download/)。
-- 官方 PDF 默认**不纳入版本控制**（见 `.gitignore`），仅保留站点 Markdown 副本。
+- 已包含官方 PDF 与站点镜像，便于离线通读；如需从仓库移除，取消 `.gitignore` 中 `# learn-inference/` 的注释即可。
 
 ---
 
