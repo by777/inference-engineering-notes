@@ -50,5 +50,7 @@ lesson-*/C3_trace
 
 # ── 实验输出 / 日志 / 模型权重（可再生成，勿提交）──
 lesson-21-量化原理与误差分析/fsmn_out/
+lesson-26-onnxsim图化简/.venv/
+lesson-26-onnxsim图化简/*.onnx
 *.log
 *.mnn

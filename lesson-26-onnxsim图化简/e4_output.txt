@@ -1,0 +1,66 @@
+
+====================================================================
+模型：conv_bn_relu
+====================================================================
+  原始           ['ai.onnx:Conv', 'ai.onnx:BatchNormalization', 'ai.onnx:Relu']
+  onnxsim      ['ai.onnx:Conv', 'ai.onnx:Relu']
+  ORT(ALL)     ['com.microsoft.nchwc:Conv', 'com.microsoft.nchwc:ReorderOutput']
+  sim→ORT      ['com.microsoft.nchwc:Conv', 'com.microsoft.nchwc:ReorderOutput']
+    onnxsim  max|diff|=0.000e+00  bit-equal=True
+    ORT      max|diff|=0.000e+00  bit-equal=True
+    sim→ORT  max|diff|=0.000e+00  bit-equal=True
+
+
+====================================================================
+模型：matmul_add
+====================================================================
+  原始           ['ai.onnx:MatMul', 'ai.onnx:Add']
+  onnxsim      ['ai.onnx:Gemm']
+  ORT(ALL)     ['ai.onnx:Gemm']
+  sim→ORT      ['ai.onnx:Gemm']
+    onnxsim  max|diff|=0.000e+00  bit-equal=True
+    ORT      max|diff|=0.000e+00  bit-equal=True
+    sim→ORT  max|diff|=0.000e+00  bit-equal=True
+
+
+====================================================================
+融合后的节点长什么样
+====================================================================
+  com.microsoft.nchwc:Conv
+    inputs = ['X', 'reorder', 'ConvBnFusion_BN_B_bb']
+    attr activation       = b'Relu'
+    attr group            = 1
+    attr kernel_shape     = [3, 3]
+    attr auto_pad         = b'NOTSET'
+    attr pads             = [1, 1, 1, 1]
+  com.microsoft.nchwc:ReorderOutput
+    inputs = ['reorder_token_0']
+    attr channels_last    = 0
+    attr channels         = 8
+
+  → activation 变成了 Conv 的一个属性，Relu 节点消失了。
+    这就是「融合」的物理形态：下游语义变成上游的一个字段。
+
+====================================================================
+收益重叠：onnxsim 先做过，ORT 就无事可做
+====================================================================
+  MatMul+Add 原始        ['ai.onnx:MatMul', 'ai.onnx:Add']
+  仅 onnxsim            ['ai.onnx:Gemm']
+  仅 ORT                ['ai.onnx:Gemm']
+  sim→ORT              ['ai.onnx:Gemm']
+
+  Conv+BN+Relu 同理：最终都收敛到同一个结果，
+  叠加不会产生额外收益 —— 该合的已经合完了。
+
+====================================================================
+结论
+====================================================================
+  1. 两者都能融合，但产物不同域：
+     onnxsim -> ai.onnx 标准算子，可分发
+     ORT     -> com.microsoft.* 私有算子，绑环境
+
+  2. 收益重叠，不是叠加。先 sim 后 ORT 与只跑 ORT 结果相同。
+
+  3. 融合产物必须是对应后端已注册的 kernel，
+     否则模型直接加载失败：com.microsoft:FusedNotExist 会报
+     'is not a registered function/op'。

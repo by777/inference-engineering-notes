@@ -66,6 +66,7 @@
 | `lesson-23-MLIR入门` | MLIR：dialect、pass、ODS/TableGen、自定义方言与 pass 工程（进行中） |
 | `lesson-24-推理工程` | 推理工程全景：两阶段（prefill/decode）、三层结构、roofline、量化粒度、多模态、生产部署 |
 | `lesson-25-浮点格式与私有数据格式` | 浮点格式（fp16/bf16/fp8/私有格式）与数值表示 |
+| `lesson-26-onnxsim图化简` | 离线图化简：40 个 pass、迭代到不动点、与 ORT 运行期优化的分工与边界 |
 | `lookup-table-approx` | 查表近似专题：分段线性 LUT、幂分解、激活函数适用性 |
 | `技术名词表.md` | 个人术语整理：把工程口语翻译成工业界通用术语 |
 
